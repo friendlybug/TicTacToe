@@ -14,10 +14,16 @@ public class Grid{
     private int height = 3;
 
     private JPanel panel = new JPanel();
+//    private String[][] str = {
+//            {"1", "2", "3" },
+//            {"4","5","6"},
+//            {"7", "8", "9"}
+//    };
+
     private String[][] str = {
-            {"1", "2", "3" },
-            {"4","5","6"},
-            {"7", "8", "9"}
+            {"", "", ""},
+            {"", "", ""},
+            {"", "", ""}
     };
     private JButton[][] button = new JButton[width][height];
 
