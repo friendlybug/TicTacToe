@@ -1,4 +1,4 @@
-![Tic Tac Toe Gif](TicTacToe.gif "Tic Tac Toe Gif")
+![Tic Tac Toe Gif](C:\Users\spide\OneDrive\Java\TicTacToe\TicTacToe.gif "Tic Tac Toe Gif")
 
 
 
@@ -70,7 +70,8 @@ synchronized (this) {
     for (int i = 0; i < grid.getWidth(); i++) {        
         for (int j = 0; j < grid.getHeight(); j++) {            
             if (whichButton == grid.getButton()[i][j]) {                
-                if ((grid.getButton()[i][j].getText()).equals("X") || (grid.getButton()[i]					[j].getText()).equals("O")) {
+                if ((grid.getButton()[i][j].getText()).equals("X") || 
+                    (grid.getButton()[i][j].getText()).equals("O")) {
                     	output.setText("Illegal Move");
                 } else {
                     grid.getButton()[i][j].setText("O");                    
