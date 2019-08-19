@@ -11,6 +11,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * TicTacToe.java
+ * <P> Tic Tac Toe Game, User Vs. Computer </p>
+ * Date: 2019-08-19
+ * Time: 12:45 AM
+ * Package: PACKAGE_NAME
+ *
+ * @author Mohamad Jayyusi - https://github.com/jayyusi
+ * @version 2.0
+ */
+
 public class TicTacToe extends JFrame implements ActionListener {
 
     //Declare Local Variables
@@ -28,12 +39,11 @@ public class TicTacToe extends JFrame implements ActionListener {
     private JTextArea output = new JTextArea(outputMessage);
 
     private Grid grid = new Grid();
-
+    private boolean userPlayed = false;
     private boolean gameOver = false;
-//    private int countMoves = 0;
-//    Object whichButton;
+    private int countMoves = 0;
 
-    public TicTacToe(){
+    public TicTacToe() {
         //Define layout for frame
         getContentPane().setLayout(new BorderLayout());
 
@@ -56,121 +66,116 @@ public class TicTacToe extends JFrame implements ActionListener {
         addActionListener();
     }
 
-    public int getFrameWidth(){
+    public int getFrameWidth() {
         return frameWidth;
     }
 
-    public int getFrameHeight(){
+    public int getFrameHeight() {
         return frameHeight;
     }
 
-    public void addActionListener(){
-        for(int i = 0; i<grid.getWidth();i++){
-            for(int j=0; j<grid.getHeight();j++){
+    public void addActionListener() {
+        for (int i = 0; i < grid.getWidth(); i++) {
+            for (int j = 0; j < grid.getHeight(); j++) {
                 grid.getButton()[i][j].addActionListener(this);
             }
         }
     }
-//
-//    public boolean gameOver(){
-//        if(countMoves == 9){
-//            return true;
-//        }else return false;
-//    }
 
-    public void play() throws InterruptedException {
-//        while(!gameOver() && !gameOver ) {
-//            output.setText("Computer's Turn");
-//            computerMove();
-//            //check if game is over
-//            if (isWinner() == 0) {
-//                output.setText("Computer Won");
-//                gameOver = true;
-//            } else if (isWinner() == 1) {
-//                output.setText("User Won");
-//                gameOver = true;
-//            } else {
-//                playerMove();
-//            }
-//            output.setText(Integer.toString(countMoves));
-//        }
-//    }
+    public void actionPerformed(ActionEvent ae) {
+        // synchronized block ensures only one thread
+        // running at a time.
+        synchronized (this) {
+            Object whichButton = ae.getSource();
+            for (int i = 0; i < grid.getWidth(); i++) {
+                for (int j = 0; j < grid.getHeight(); j++) {
+                    if (whichButton == grid.getButton()[i][j]) {
+                        if ((grid.getButton()[i][j].getText()).equals("X") ||
+                                (grid.getButton()[i][j].getText()).equals("O")) {
+                            output.setText("Illegal Move");
+                        } else {
+                            grid.getButton()[i][j].setText("O");
+                            userPlayed = true;
+                            if (++countMoves == 9 && isWinner() == -1) {
+                                output.setText("Game Over - No Win");
+                                disableButtons();
+                            }
 
-        int rand1, rand2;
-        int countMoves = 0;
-        while (!gameOver) {
-            //computer turn
-            output.setText("Computer's Turn");
-            boolean computerTurn = true;
-            while(computerTurn) {
-                rand1 = (int) (grid.getWidth() * Math.random());
-                rand2 = (int) (grid.getHeight() * Math.random());
-                if ( (grid.getButton()[rand1][rand2].getText()).equals("")){
-                    grid.getButton()[rand1][rand2].setText("X");
-                    if (countMoves == 9){
-                        output.setText("No one won");
-                        break;
-                    }else countMoves++;
-                    computerTurn = false;
+                            if (isWinner() == 1) {
+                                output.setText("User Won");
+                                disableButtons();
+                            }//else output.setText("...");
+
+
+                            //System.out.println("Waiting for return key.");
+                            System.out.println("inside actionperformed - Player clicked panel");
+
+                            // notifies the produce thread that it
+                            // can wake up.
+                            notify();
+
+                            // Sleep
+                            //Thread.sleep(2000);
+                        }
+                    }
                 }
             }
-            //check if game is over
-            if (isWinner() == 0) {
-                output.setText("Computer Won");
-                gameOver = true;
-                break;
-            }
-            else if (isWinner() == 1) {
-                output.setText("User Won");
-                gameOver = true;
-                break;
-            }
-
-            //player turn
-            output.setText("Player's Turn");
-            TimeUnit.SECONDS.sleep(6);
-            if (countMoves == 9){
-                output.setText("No one won");
-                break;
-            }else countMoves++;
-            //check if game is over
-            if (isWinner() == 0) {
-                output.setText("Computer Won");
-                gameOver = true;
-                break;
-            }
-            else if (isWinner() == 1) {
-                output.setText("User Won");
-                gameOver = true;
-                break;
-            }
-
         }
     }
 
-//    public void computerMove() {
-//        int rand1, rand2;
-//        //computer turn
-//        output.setText("Computer's Turn");
-//        boolean computerTurn = true;
-//        while (computerTurn) {
-//            rand1 = (int) (grid.getWidth() * Math.random());
-//            rand2 = (int) (grid.getHeight() * Math.random());
-//            if ((grid.getButton()[rand1][rand2].getText()).equals("")) {
-//                grid.getButton()[rand1][rand2].setText("X");
-//                countMoves++;
-//                computerTurn = false;
-//            }
-//        }
-//    }
+    public void play() throws InterruptedException {
 
-//    public void playerMove(){
-//        output.setText("Player's Turn");
-//        JButton button = (JButton) whichButton;
-//        if (button.getText().equals("O")){
-//            countMoves++;
-//        }
-//    }
+        synchronized (this) {
+            while (true) {
+                computerPlay();
+                if (isWinner() == 0) {
+                    output.setText("Computer Won");
+                    disableButtons();
+                    break;
+                }
+
+                //debugging line
+                //System.out.println("inside play method ( Computer Played )");
+
+                // releases the lock on shared resource
+                wait();
+
+                //debugging line
+                // and waits till some other method invokes notify().
+                System.out.println("User clicked the panel, resumed play method ( Computer Turn )");
+            }
+        }
+    }
+
+    public void computerPlay() throws InterruptedException {
+        int rand1, rand2;
+        while (true) {
+            rand1 = (int) (grid.getWidth() * Math.random());
+            rand2 = (int) (grid.getHeight() * Math.random());
+            if (grid.getButton()[rand1][rand2].getText().equals("") && !gameOver) {
+                TimeUnit.SECONDS.sleep(2);//2 seconds wait, to give user time to see what happened on the board.
+                grid.getButton()[rand1][rand2].setText("X");
+                if (++countMoves == 9 && isWinner() == -1) {
+                    output.setText("Game Over - No Win");
+                    disableButtons();
+                }
+                break;
+            }
+        }
+    }
+
+    public void disableButtons() {
+        middlePanel.getComponent(0).setEnabled(false);
+        middlePanel.getComponent(1).setEnabled(false);
+        middlePanel.getComponent(2).setEnabled(false);
+        middlePanel.getComponent(3).setEnabled(false);
+        middlePanel.getComponent(4).setEnabled(false);
+        middlePanel.getComponent(5).setEnabled(false);
+        middlePanel.getComponent(6).setEnabled(false);
+        middlePanel.getComponent(7).setEnabled(false);
+        middlePanel.getComponent(8).setEnabled(false);
+        gameOver = true;
+    }
 
     //0 is computer, 1 is user
     public int isWinner() {
@@ -250,36 +255,21 @@ public class TicTacToe extends JFrame implements ActionListener {
         }
         return result;
     }
-    public void actionPerformed(ActionEvent ae){
-        Object whichButton = ae.getSource();
-        for(int i = 0; i<grid.getWidth();i++){
-            for(int j=0; j<grid.getHeight();j++){
-                if(whichButton == grid.getButton()[i][j]){
-                    if((grid.getButton()[i][j].getText()).equals("X") ||
-                            (grid.getButton()[i][j].getText()).equals("O")){
-                        output.setText("Illegal Move");
-                    }else {
-                        grid.getButton()[i][j].setText("O");
-                        output.setText("");
-                    }
-                }
-            }
-        }
-    }
-
 
     //Main method, creates the frame and runs the play method.
     public static void main(String[] args) throws InterruptedException {
         TicTacToe tictactoe = new TicTacToe();
-        tictactoe.setSize(tictactoe.getFrameWidth(),tictactoe.getFrameHeight());
+        tictactoe.setSize(tictactoe.getFrameWidth(), tictactoe.getFrameHeight());
         tictactoe.setResizable(false);
         tictactoe.setVisible(true);
         tictactoe.setTitle("Tic Tac Toe Game");
+        ImageIcon img = new ImageIcon("tictactoe_logo.gif");
+        tictactoe.setIconImage(img.getImage());
         //Get the screen size
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         //Set the frame to be centred on screen
-        tictactoe.setLocation(dim.width/2-tictactoe.getSize().width/2,
-                dim.height/2-tictactoe.getSize().height/2);
+        tictactoe.setLocation(dim.width / 2 - tictactoe.getSize().width / 2,
+                dim.height / 2 - tictactoe.getSize().height / 2);
 
         //play the game
         tictactoe.play();
