@@ -1,4 +1,4 @@
-![Tic Tac Toe Gif](C:\Users\spide\OneDrive\Java\TicTacToe\TicTacToe.gif "Tic Tac Toe Gif")
+![Tic Tac Toe Gif](TicTacToe.gif "Tic Tac Toe Gif")
 
 
 
